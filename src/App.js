@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "./components/ui/card";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
+
 import {
   LineChart,
   Line,
@@ -16,30 +17,30 @@ import {
 const bosses = {
   Rasial: {
     drops: [
-      { name: "Drop A", rate: 1 / 630, value: 80000000 },
-      { name: "Drop B", rate: 1 / 630, value: 13000000 },
-      { name: "Drop C", rate: 1 / 630, value: 12000000 },
-      { name: "Drop D", rate: 1 / 630, value: 4200000 },
-      { name: "Drop E", rate: 1 / 630, value: 8000000 },
-      { name: "Drop F", rate: 1 / 630, value: 6000000 },
-      { name: "Drop G", rate: 1 / 630, value: 5000000 },
+      { name: "Drop A", rate: 1 / 630 },
+      { name: "Drop B", rate: 1 / 630 },
+      { name: "Drop C", rate: 1 / 630 },
+      { name: "Drop D", rate: 1 / 630 },
+      { name: "Drop E", rate: 1 / 630 },
+      { name: "Drop F", rate: 1 / 630 },
+      { name: "Drop G", rate: 1 / 630 },
     ],
   },
   Nakatra: {
     drops: [
-      { name: "Divine Rage", rate: 1 / 160, value: 60000000 },
-      { name: "Scripture of Amascut", rate: 1 / 160, value: 15000000 },
-      { name: "Roar of Awakening", rate: 1 / 80, value: 10000000 },
-      { name: "Ode to Deceit", rate: 1 / 80, value: 8000000 },
-      { name: "Shard of Genesis", rate: 1 / 80, value: 5000000 },
+      { name: "Divine Rage", rate: 1 / 160 },
+      { name: "Scripture of Amascut", rate: 1 / 160 },
+      { name: "Roar of Awakening", rate: 1 / 80 },
+      { name: "Ode to Deceit", rate: 1 / 80 },
+      { name: "Shard of Genesis", rate: 1 / 80 },
     ],
   },
   GateOfElidinis: {
     drops: [
-      { name: "Memory Dowser", rate: 1 / 480, value: 805709561 },
-      { name: "Scripture", rate: 1 / 480, value: 131771789 },
-      { name: "Runic Attuner", rate: 1 / 480, value: 129883597 },
-      { name: "Prayer Codex", rate: 1 / 480, value: 42012649 },
+      { name: "Memory Dowser", rate: 1 / 480 },
+      { name: "Scripture", rate: 1 / 480 },
+      { name: "Runic Attuner", rate: 1 / 480 },
+      { name: "Prayer Codex", rate: 1 / 480 },
     ],
   },
 };
@@ -116,7 +117,7 @@ export default function App() {
       setErrorMessage("Please select a drop.");
       return;
     }
-    
+
     const killNumber = Number(killInput);
     const lastDropKill = kills.reduce(
       (max, k) => (k.drop ? Math.max(max, k.kill) : max),
@@ -130,11 +131,14 @@ export default function App() {
       return;
     }
 
-  setKills([...kills, { kill: killNumber, drop: dropInput, value: Number(dropPriceInput) }]);
-  setKillInput((killNumber + 1).toString());
-  setDropInput("");
-  setDropPriceInput("");
-  setErrorMessage("");
+    setKills([
+      ...kills,
+      { kill: killNumber, drop: dropInput, value: Number(dropPriceInput) },
+    ]);
+    setKillInput((killNumber + 1).toString());
+    setDropInput("");
+    setDropPriceInput("");
+    setErrorMessage("");
   };
 
   const handleDeleteKill = (index) => {
@@ -164,21 +168,15 @@ export default function App() {
     setCommonLockedMap((prev) => ({ ...prev, [boss]: false }));
   };
 
-      const totalGP = kills.reduce((sum, k) => sum + (k.value || 0), 0) + Number(storedCommonValue || 0);
-      const chartData = kills.map(k => ({ kill: k.kill, gp: k.value || 0 }));
-      const drop = bosses[boss].drops.find((d) => d.name === k.drop);
-      return sum + (drop ? drop.value : 0);
-    }, 0) + Number(storedCommonValue || 0);
+  const totalGP =
+    kills.reduce((sum, k) => sum + (k.value || 0), 0) +
+    Number(storedCommonValue || 0);
+  const chartData = kills.map((k) => ({ kill: k.kill, gp: k.value || 0 }));
 
   const totalTime = kills.length * killTime;
   const gpPerHour =
     totalTime > 0 ? (totalGP / (totalTime / 3600)).toFixed(0) : 0;
   const gpPerKill = kills.length > 0 ? (totalGP / kills.length).toFixed(0) : 0;
-
-  const chartData = kills.map((k) => ({
-    kill: k.kill,
-    gp: bosses[boss].drops.find((d) => d.name === k.drop)?.value || 0,
-  }));
 
   const calculateDryStreaks = (kills) => {
     const streaks = [];
@@ -279,7 +277,7 @@ export default function App() {
                 <option value="">Select drop</option>
                 {bosses[boss].drops.map((d, i) => (
                   <option key={i} value={d.name}>
-                    {d.name} ({d.value.toLocaleString()} gp)
+                    {d.name}
                   </option>
                 ))}
               </select>
@@ -366,7 +364,9 @@ export default function App() {
                         <td className="py-1">{k.kill}</td>
                         <td className="py-1">{k.drop || "No drop"}</td>
                         <td className="py-1">
-                          <td className="py-1">{k.value ? k.value.toLocaleString() : "0"}</td>
+                          <td className="py-1">
+                            {k.value ? k.value.toLocaleString() : "0"}
+                          </td>
                         </td>
                         <td className="py-1">
                           <Button
