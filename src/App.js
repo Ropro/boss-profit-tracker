@@ -104,6 +104,10 @@ useEffect(() => {
   }, [kills, boss]);
 
   const handleAddKill = () => {
+      if (!dropInput) {
+    setErrorMessage("Please select a drop.");
+    return;
+  }
     const killNumber = Number(killInput);
     const lastDropKill = kills.reduce((max, k) => k.drop ? Math.max(max, k.kill) : max, 0);
 
@@ -186,16 +190,19 @@ const getDryStreakColor = (streak) => {
   return (
     <div className="min-h-screen bg-gray-100 p-6 space-y-6">
       <div className="flex flex-col items-center gap-2">
+        <div className="w-full max-w-xl mx-auto"></div>
         <h1 className="text-3xl font-bold text-center text-gray-800">Boss Tracker</h1>
-  <div className="bg-red-600 text-white p-8 rounded-xl text-3xl text-center mt-20">
-    Tailwind is finally working!
-  </div>
         <div className="flex gap-4 items-center">
-          <select className="p-2 rounded bg-gray-100" value={boss} onChange={e => setBoss(e.target.value)}>
-            {Object.keys(bosses).map(b => (
-              <option key={b} value={b}>{b}</option>
-            ))}
-          </select>
+    <select
+       className="p-2 rounded border border-gray-300 bg-white shadow-sm"
+       value={boss}
+       onChange={e => setBoss(e.target.value)}
+    >
+      {Object.keys(bosses).map(b => (
+      <option key={b} value={b}>{b}</option>
+      ))}
+    </select>
+
           <div className="flex gap-2 items-center">
             <Input
               type="number"
@@ -220,6 +227,7 @@ const getDryStreakColor = (streak) => {
         </div>
       </div>
 
+          <div className="w-full max-w-xl mx-auto">
       <Card>
         <CardContent className="space-y-2 pt-4">
           <div className="flex gap-2">
@@ -235,14 +243,14 @@ const getDryStreakColor = (streak) => {
               value={dropInput}
               onChange={e => setDropInput(e.target.value)}
             >
-              <option value="">No drop</option>
+              <option value="">Select drop</option>
               {bosses[boss].drops.map((d, i) => (
                 <option key={i} value={d.name}>
                   {d.name} ({d.value.toLocaleString()} gp)
                 </option>
               ))}
             </select>
-            <Button onClick={handleAddKill}>Add Drop</Button>
+            <Button onClick={handleAddKill} disabled={!dropInput}>Add Drop</Button>
           </div>
           {errorMessage && <div className="text-red-500 text-sm font-medium mt-1">{errorMessage}</div>}
 
@@ -324,6 +332,7 @@ const getDryStreakColor = (streak) => {
           </CardContent>
         </Card>
       )}
+    </div>
     </div>
   );
 }

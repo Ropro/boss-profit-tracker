@@ -545,11 +545,6 @@ video {
   --tw-contain-style:  ;
 }
 
-.mx-auto {
-  margin-left: auto;
-  margin-right: auto;
-}
-
 .mb-2 {
   margin-bottom: 0.5rem;
 }
@@ -592,14 +587,6 @@ video {
 
 .w-full {
   width: 100%;
-}
-
-.max-w-xl {
-  max-width: 36rem;
-}
-
-.max-w-lg {
-  max-width: 32rem;
 }
 
 .flex-col {
