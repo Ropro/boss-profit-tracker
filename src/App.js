@@ -5,6 +5,7 @@ import { Card, CardContent } from "./components/ui/card";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
 
+
 import {
   LineChart,
   Line,
@@ -117,6 +118,10 @@ export default function App() {
       setErrorMessage("Please select a drop.");
       return;
     }
+    if (Number(dropPriceInput) < 0) {
+    setErrorMessage("Sale price cannot be negative.");
+    return;
+  }
 
     const killNumber = Number(killInput);
     const lastDropKill = kills.reduce(
@@ -285,7 +290,15 @@ export default function App() {
                 type="number"
                 placeholder="Sale price"
                 value={dropPriceInput}
-                onChange={(e) => setDropPriceInput(e.target.value)}
+                onChange={(e) => {
+  const value = e.target.value;
+  if (value === "" || Number(value) >= 0) {
+    setDropPriceInput(value);
+    setErrorMessage(""); // Clear error if valid
+  } else {
+    setErrorMessage("Sale price cannot be negative.");
+  }
+}}
                 className="w-32"
               />
               <Button
