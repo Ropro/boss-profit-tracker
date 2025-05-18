@@ -171,10 +171,13 @@ export default function App() {
     Number(storedCommonValue || 0);
   const chartData = kills.map((k) => ({ kill: k.kill, gp: k.value || 0 }));
 
-  const lastKillNumber = kills.length > 0 ? Math.max(...kills.map(k => k.kill)) : 0;
+  const lastKillNumber =
+    kills.length > 0 ? Math.max(...kills.map((k) => k.kill)) : 0;
   const totalTime = lastKillNumber * killTime;
-  const gpPerHour = totalTime > 0 ? (totalGP / (totalTime / 3600)).toFixed(0) : 0;
-  const gpPerKill = lastKillNumber > 0 ? (totalGP / lastKillNumber).toFixed(0) : 0;
+  const gpPerHour =
+    totalTime > 0 ? (totalGP / (totalTime / 3600)).toFixed(0) : 0;
+  const gpPerKill =
+    lastKillNumber > 0 ? (totalGP / lastKillNumber).toFixed(0) : 0;
   const calculateDryStreaks = (kills) => {
     const streaks = [];
     let lastDropKill = null;
@@ -255,173 +258,199 @@ export default function App() {
         </div>
       </div>
 
-<div className="grid grid-cols-12 min-h-screen w-full max-w-7xl mx-auto">
-  {/* Instructions Card */}
-  <div className="hidden lg:block col-span-3 flex justify-end pr-8">
-    <Card className="w-64">
-      <CardContent className="pt-4">
-        <h2 className="text-lg font-semibold mb-2 border-b pb-1">Instructions</h2>
-        <ul className="list-disc list-inside text-gray-700 space-y-2">
-          <li>Select a boss from the dropdown menu.</li>
-          <li>Set your average kill time (minutes and seconds).</li>
-          <li>Add drops to your log by selecting the drop, entering the kill number, sale price, and clicking "Add Drop".</li>
-          <li>For bosses with common drops stored in chest, enter the chest value and set it.</li>
-          <li>Review your GP statistics and drop log.</li>
-        </ul>
-      </CardContent>
-    </Card>
-  </div>
+      <div className="flex w-full min-h-screen max-w-7xl mx-auto items-start justify-center gap-8 px-4">
+        {/* Instructions Card */}
+        <div className="hidden lg:block w-64 min-h-[300px]">
+          <Card>
+            <CardContent className="pt-4">
+              <h2 className="text-lg font-semibold mb-2 border-b pb-1">
+                Instructions
+              </h2>
+              <ul className="list-disc list-inside text-gray-700 space-y-2">
+                <li>Select a boss from the dropdown menu.</li>
+                <li>Set your average kill time (minutes and seconds).</li>
+                <li>
+                  Add drops to your log by selecting the drop, entering the kill
+                  number, sale price, and clicking "Add Drop".
+                </li>
+                <li>
+                  For bosses with common drops stored in chest, enter the chest
+                  value and set it.
+                </li>
+                <li>Review your GP statistics and drop log.</li>
+              </ul>
+            </CardContent>
+          </Card>
+        </div>
 
-  <div className="col-span-12 lg:col-span-6 flex justify-center">
-    {/* Main Card */}
-    <div className="w-full max-w-x1">
-        <Card>
-          <CardContent className="space-y-2 pt-4">
-            <div className="flex gap-2">
-              <Input
-                type="number"
-                placeholder="Kill #"
-                value={killInput}
-                onChange={(e) => setKillInput(e.target.value)}
-                className="w-20 h-10"
-              />
-              <select
-                className="p-2 rounded bg-gray-100 h-10 w-80"
-                value={dropInput}
-                onChange={(e) => setDropInput(e.target.value)}
-              >
-                <option value="">Select drop</option>
-                {bosses[boss].drops.map((d, i) => (
-                  <option key={i} value={d.name}>
-                    {d.name}
-                  </option>
-                ))}
-              </select>
-              <Input
-                type="number"
-                placeholder="Sale price"
-                value={dropPriceInput}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value === "" || Number(value) >= 0) {
-                    setDropPriceInput(value);
-                    setErrorMessage(""); // Clear error if valid
-                  } else {
-                    setErrorMessage("Sale price cannot be negative.");
-                  }
-                }}
-                className="w-32 h-10"
-              />
-              <Button
-                onClick={handleAddKill}
-                disabled={!dropInput || !dropPriceInput}
-                className="w-16 h-14"
-              >
-                Add Drop
-              </Button>
-            </div>
-            {errorMessage && (
-              <div className="text-red-500 text-sm font-medium mt-1">
-                {errorMessage}
-              </div>
-            )}
-
-            {(boss === "Nakatra" || boss === "GateOfElidinis") && (
-              <div className="flex gap-2 items-center mt-2">
+        <div className="flex-1 flex justify-center w-full max-w-2x1">
+          {/* Main Card */}
+          <Card>
+            <CardContent className="pt-4">
+              <div className="flex gap-2">
                 <Input
                   type="number"
-                  placeholder="Common GP"
-                  value={commonLocked ? storedCommonValue : commonValue}
+                  placeholder="Kill #"
+                  value={killInput}
+                  onChange={(e) => setKillInput(e.target.value)}
+                  className="w-20 h-10"
+                />
+                <select
+                  className="p-2 rounded bg-gray-100 h-10 w-80"
+                  value={dropInput}
+                  onChange={(e) => setDropInput(e.target.value)}
+                >
+                  <option value="">Select drop</option>
+                  {bosses[boss].drops.map((d, i) => (
+                    <option key={i} value={d.name}>
+                      {d.name}
+                    </option>
+                  ))}
+                </select>
+                <Input
+                  type="number"
+                  placeholder="Sale price"
+                  value={dropPriceInput}
                   onChange={(e) => {
                     const value = e.target.value;
                     if (value === "" || Number(value) >= 0) {
-                      setCommonValue(value);
-                      setErrorMessage("");
+                      setDropPriceInput(value);
+                      setErrorMessage(""); // Clear error if valid
                     } else {
-                      setErrorMessage("Common drops value cannot be negative.");
+                      setErrorMessage("Sale price cannot be negative.");
                     }
                   }}
-                  disabled={commonLocked}
+                  className="w-32 h-10"
                 />
-                <select
-                  className="p-2 rounded bg-gray-200 text-gray-500"
-                  disabled
+                <Button
+                  onClick={handleAddKill}
+                  disabled={!dropInput || !dropPriceInput}
+                  className="w-16 h-14"
                 >
-                  <option>Common drops value</option>
-                </select>
-                <Button onClick={handleSetCommonValue} disabled={commonLocked}>
-                  Set
+                  Add Drop
                 </Button>
-                {commonLocked && (
-                  <Button variant="outline" onClick={handleEditCommonValue}>
-                    Edit
-                  </Button>
-                )}
               </div>
-            )}
+              {errorMessage && (
+                <div className="text-red-500 text-sm font-medium mt-1">
+                  {errorMessage}
+                </div>
+              )}
 
-            <div className="space-y-1">
-              <div>Total GP: {totalGP.toLocaleString()}</div>
-              <div>GP / Kill: {parseInt(gpPerKill).toLocaleString()}</div>
-              <div>GP / Hour: {parseInt(gpPerHour).toLocaleString()}</div>
-            </div>
+              {(boss === "Nakatra" || boss === "GateOfElidinis") && (
+                <div className="flex gap-2 items-center mt-2">
+                  <Input
+                    type="number"
+                    placeholder="Common GP"
+                    value={commonLocked ? storedCommonValue : commonValue}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === "" || Number(value) >= 0) {
+                        setCommonValue(value);
+                        setErrorMessage("");
+                      } else {
+                        setErrorMessage(
+                          "Common drops value cannot be negative."
+                        );
+                      }
+                    }}
+                    disabled={commonLocked}
+                  />
+                  <select
+                    className="p-2 rounded bg-gray-200 text-gray-500"
+                    disabled
+                  >
+                    <option>Common drops value</option>
+                  </select>
+                  <Button
+                    onClick={handleSetCommonValue}
+                    disabled={commonLocked}
+                  >
+                    Set
+                  </Button>
+                  {commonLocked && (
+                    <Button variant="outline" onClick={handleEditCommonValue}>
+                      Edit
+                    </Button>
+                  )}
+                </div>
+              )}
 
-            <div className="pt-4">
-              <h2 className="text-lg font-semibold mb-2 border-b pb-1">
-                Kill Log
-              </h2>
-              <table className="w-full text-sm text-left border border-gray-200 shadow-sm rounded-xl overflow-hidden">
-                <thead>
-                  <tr className="text-left border-b">
-                    <th className="py-1">Dry Streak</th>
-                    <th className="py-1">Kill #</th>
-                    <th className="py-1">Drop</th>
-                    <th className="py-1">Value</th>
-                    <th className="py-1"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {kills.map((k, index) => {
-                    const drop = bosses[boss].drops.find(
-                      (d) => d.name === k.drop
-                    );
-                    return (
-                      <tr key={index} className="border-b">
-                        <td
-                          className={`py-1 font-semibold ${getDryStreakColor(
-                            dryStreaks[index]
-                          )}`}
-                        >
-                          {dryStreaks[index] !== null ? dryStreaks[index] : ""}
-                        </td>
-                        <td className="py-1">{k.kill}</td>
-                        <td className="py-1">{k.drop || "No drop"}</td>
-                        <td className="py-1">
-                          <td className="py-1">
-                            {k.value ? k.value.toLocaleString() : "0"}
-                          </td>
-                        </td>
-                        <td className="py-1">
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDeleteKill(index)}
+              <div className="space-y-1">
+                <div>Total GP: {totalGP.toLocaleString()}</div>
+                <div>GP / Kill: {parseInt(gpPerKill).toLocaleString()}</div>
+                <div>GP / Hour: {parseInt(gpPerHour).toLocaleString()}</div>
+              </div>
+
+              <div className="pt-4">
+                <h2 className="text-lg font-semibold mb-2 border-b pb-1">
+                  Kill Log
+                </h2>
+                <table className="w-full text-sm text-left border border-gray-200 shadow-sm rounded-xl overflow-hidden">
+                  <thead>
+                    <tr className="text-left border-b">
+                      <th className="py-1">Dry Streak</th>
+                      <th className="py-1">Kill #</th>
+                      <th className="py-1">Drop</th>
+                      <th className="py-1">Value</th>
+                      <th className="py-1"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {kills.map((k, index) => {
+                      const drop = bosses[boss].drops.find(
+                        (d) => d.name === k.drop
+                      );
+                      return (
+                        <tr key={index} className="border-b">
+                          <td
+                            className={`py-1 font-semibold ${getDryStreakColor(
+                              dryStreaks[index]
+                            )}`}
                           >
-                            Delete
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-        </div>
+                            {dryStreaks[index] !== null
+                              ? dryStreaks[index]
+                              : ""}
+                          </td>
+                          <td className="py-1">{k.kill}</td>
+                          <td className="py-1">{k.drop || "No drop"}</td>
+                          <td className="py-1">
+                            <td className="py-1">
+                              {k.value ? k.value.toLocaleString() : "0"}
+                            </td>
+                          </td>
+                          <td className="py-1">
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleDeleteKill(index)}
+                            >
+                              Delete
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-       {/* <Button variant="outline" onClick={() => setShowChart(!showChart)}>
+        {/* Right FAQ Card */}
+        <div className="hidden lg:block w-64 min-h-[300px]">
+          <Card>
+            <CardContent className="pt-4">
+              <h2 className="text-lg font-semibold mb-2 border-b pb-1">FAQ</h2>
+              {/* ...FAQ content goes here... */}
+              <span className="text-gray-400 italic mt-8">
+                FAQ coming soon...
+              </span>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* <Button variant="outline" onClick={() => setShowChart(!showChart)}>
           {showChart ? "Hide Chart" : "Show Chart"}
         </Button> */}
 
