@@ -61,19 +61,10 @@ export default function App() {
   const [storedCommonValue, setStoredCommonValue] = useState("");
   const [commonLockedMap, setCommonLockedMap] = useState({});
   const [showChart, setShowChart] = useState(false);
-  const [confirmIndex, setConfirmIndex] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const timeLocked = timeLockedMap[boss] || false;
   const commonLocked = commonLockedMap[boss] || false;
   const [dropPriceInput, setDropPriceInput] = useState("");
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem("boss_tracker_dark") === "true";
-  });
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", darkMode);
-    localStorage.setItem("boss_tracker_dark", darkMode);
-  }, [darkMode]);
 
   useEffect(() => {
     const savedKills = localStorage.getItem(`boss_tracker_${boss}`);
