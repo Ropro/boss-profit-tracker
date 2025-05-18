@@ -264,7 +264,26 @@ export default function App() {
         </div>
       </div>
 
-      <div className="w-full max-w-2xl mx-auto">
+<div className="grid grid-cols-12 min-h-screen w-full max-w-7xl mx-auto">
+  {/* Instructions Card */}
+  <div className="hidden lg:block col-span-3 flex justify-end pr-8">
+    <Card className="w-64">
+      <CardContent className="pt-4">
+        <h2 className="text-lg font-semibold mb-2 border-b pb-1">Instructions</h2>
+        <ul className="list-disc list-inside text-gray-700 space-y-2">
+          <li>Select a boss from the dropdown menu.</li>
+          <li>Set your average kill time (minutes and seconds).</li>
+          <li>Add drops to your log by selecting the drop, entering the kill number, sale price, and clicking "Add Drop".</li>
+          <li>For bosses with common drops stored in chest, enter the chest value and set it.</li>
+          <li>Review your GP statistics and drop log.</li>
+        </ul>
+      </CardContent>
+    </Card>
+  </div>
+
+  <div className="col-span-12 lg:col-span-6 flex justify-center">
+    {/* Main Card */}
+    <div className="w-full max-w-x1">
         <Card>
           <CardContent className="space-y-2 pt-4">
             <div className="flex gap-2">
@@ -305,7 +324,7 @@ export default function App() {
               <Button
                 onClick={handleAddKill}
                 disabled={!dropInput || !dropPriceInput}
-                className="w-32 h-10"
+                className="w-16 h-14"
               >
                 Add Drop
               </Button>
@@ -408,10 +427,12 @@ export default function App() {
             </div>
           </CardContent>
         </Card>
+        </div>
+        </div>
 
-        <Button variant="outline" onClick={() => setShowChart(!showChart)}>
+       {/* <Button variant="outline" onClick={() => setShowChart(!showChart)}>
           {showChart ? "Hide Chart" : "Show Chart"}
-        </Button>
+        </Button> */}
 
         {showChart && (
           <Card>
