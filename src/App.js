@@ -5,7 +5,6 @@ import { Card, CardContent } from "./components/ui/card";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
 
-
 import {
   LineChart,
   Line,
@@ -17,31 +16,34 @@ import {
 
 const bosses = {
   Rasial: {
+    fullName: ["Rasial, the First Necromancer"],
     drops: [
-      { name: "Drop A", rate: 1 / 630 },
-      { name: "Drop B", rate: 1 / 630 },
-      { name: "Drop C", rate: 1 / 630 },
-      { name: "Drop D", rate: 1 / 630 },
-      { name: "Drop E", rate: 1 / 630 },
-      { name: "Drop F", rate: 1 / 630 },
-      { name: "Drop G", rate: 1 / 630 },
+      { name: "Omni guard", rate: 1 / 632 },
+      { name: "Soulbound lantern", rate: 1 / 632 },
+      { name: "Crown of the First Necromancer", rate: 1 / 630 },
+      { name: "Robe top of the First Necromancer", rate: 1 / 630 },
+      { name: "Robe bottom of the First Necromancer", rate: 1 / 630 },
+      { name: "Hand wrap of the First Necromancer", rate: 1 / 630 },
+      { name: "Foot wraps of the First Necromancer", rate: 1 / 630 },
     ],
   },
   Nakatra: {
+    fullName: ["Nakatra, Devourer Eternal"],
     drops: [
-      { name: "Divine Rage", rate: 1 / 160 },
+      { name: "Divine Rage prayer codex", rate: 1 / 160 },
       { name: "Scripture of Amascut", rate: 1 / 160 },
       { name: "Roar of Awakening", rate: 1 / 80 },
       { name: "Ode to Deceit", rate: 1 / 80 },
-      { name: "Shard of Genesis", rate: 1 / 80 },
+      { name: "Shard of Genesis Essence", rate: 1 / 80 },
     ],
   },
   GateOfElidinis: {
+    fullName: ["The Gate of Elidinis"],
     drops: [
-      { name: "Memory Dowser", rate: 1 / 480 },
-      { name: "Scripture", rate: 1 / 480 },
-      { name: "Runic Attuner", rate: 1 / 480 },
-      { name: "Prayer Codex", rate: 1 / 480 },
+      { name: "Eclipsed Soul prayer codex", rate: 1 / 480 },
+      { name: "Memory dowser", rate: 1 / 480 },
+      { name: "Runic attuner", rate: 1 / 480 },
+      { name: "Scripture of Elidinis", rate: 1 / 480 },
     ],
   },
 };
@@ -119,9 +121,9 @@ export default function App() {
       return;
     }
     if (Number(dropPriceInput) < 0) {
-    setErrorMessage("Sale price cannot be negative.");
-    return;
-  }
+      setErrorMessage("Sale price cannot be negative.");
+      return;
+    }
 
     const killNumber = Number(killInput);
     const lastDropKill = kills.reduce(
@@ -178,11 +180,10 @@ export default function App() {
     Number(storedCommonValue || 0);
   const chartData = kills.map((k) => ({ kill: k.kill, gp: k.value || 0 }));
 
-  const totalTime = kills.length * killTime;
-  const gpPerHour =
-    totalTime > 0 ? (totalGP / (totalTime / 3600)).toFixed(0) : 0;
-  const gpPerKill = kills.length > 0 ? (totalGP / kills.length).toFixed(0) : 0;
-
+  const lastKillNumber = kills.length > 0 ? Math.max(...kills.map(k => k.kill)) : 0;
+  const totalTime = lastKillNumber * killTime;
+  const gpPerHour = totalTime > 0 ? (totalGP / (totalTime / 3600)).toFixed(0) : 0;
+  const gpPerKill = lastKillNumber > 0 ? (totalGP / lastKillNumber).toFixed(0) : 0;
   const calculateDryStreaks = (kills) => {
     const streaks = [];
     let lastDropKill = null;
@@ -228,7 +229,7 @@ export default function App() {
           >
             {Object.keys(bosses).map((b) => (
               <option key={b} value={b}>
-                {b}
+                {bosses[b].fullName}
               </option>
             ))}
           </select>
@@ -263,7 +264,7 @@ export default function App() {
         </div>
       </div>
 
-      <div className="w-full max-w-xl mx-auto">
+      <div className="w-full max-w-2xl mx-auto">
         <Card>
           <CardContent className="space-y-2 pt-4">
             <div className="flex gap-2">
@@ -272,10 +273,10 @@ export default function App() {
                 placeholder="Kill #"
                 value={killInput}
                 onChange={(e) => setKillInput(e.target.value)}
-                className="w-24"
+                className="w-20 h-10"
               />
               <select
-                className="p-2 rounded bg-gray-100"
+                className="p-2 rounded bg-gray-100 h-10 w-80"
                 value={dropInput}
                 onChange={(e) => setDropInput(e.target.value)}
               >
@@ -291,19 +292,20 @@ export default function App() {
                 placeholder="Sale price"
                 value={dropPriceInput}
                 onChange={(e) => {
-  const value = e.target.value;
-  if (value === "" || Number(value) >= 0) {
-    setDropPriceInput(value);
-    setErrorMessage(""); // Clear error if valid
-  } else {
-    setErrorMessage("Sale price cannot be negative.");
-  }
-}}
-                className="w-32"
+                  const value = e.target.value;
+                  if (value === "" || Number(value) >= 0) {
+                    setDropPriceInput(value);
+                    setErrorMessage(""); // Clear error if valid
+                  } else {
+                    setErrorMessage("Sale price cannot be negative.");
+                  }
+                }}
+                className="w-32 h-10"
               />
               <Button
                 onClick={handleAddKill}
                 disabled={!dropInput || !dropPriceInput}
+                className="w-32 h-10"
               >
                 Add Drop
               </Button>
@@ -320,7 +322,15 @@ export default function App() {
                   type="number"
                   placeholder="Common GP"
                   value={commonLocked ? storedCommonValue : commonValue}
-                  onChange={(e) => setCommonValue(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "" || Number(value) >= 0) {
+                      setCommonValue(value);
+                      setErrorMessage("");
+                    } else {
+                      setErrorMessage("Common drops value cannot be negative.");
+                    }
+                  }}
                   disabled={commonLocked}
                 />
                 <select
