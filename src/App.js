@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "./components/ui/card";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
+import InstructionsCard from "./components/InstructionsCard";
+import FAQCard from "./components/FAQCard";
+import bosses from "./components/bosses";
 
 import {
   LineChart,
@@ -13,40 +16,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-
-const bosses = {
-  Rasial: {
-    fullName: ["Rasial, the First Necromancer"],
-    drops: [
-      { name: "Omni guard", rate: 1 / 632 },
-      { name: "Soulbound lantern", rate: 1 / 632 },
-      { name: "Crown of the First Necromancer", rate: 1 / 630 },
-      { name: "Robe top of the First Necromancer", rate: 1 / 630 },
-      { name: "Robe bottom of the First Necromancer", rate: 1 / 630 },
-      { name: "Hand wrap of the First Necromancer", rate: 1 / 630 },
-      { name: "Foot wraps of the First Necromancer", rate: 1 / 630 },
-    ],
-  },
-  Nakatra: {
-    fullName: ["Nakatra, Devourer Eternal"],
-    drops: [
-      { name: "Divine Rage prayer codex", rate: 1 / 160 },
-      { name: "Scripture of Amascut", rate: 1 / 160 },
-      { name: "Roar of Awakening", rate: 1 / 80 },
-      { name: "Ode to Deceit", rate: 1 / 80 },
-      { name: "Shard of Genesis Essence", rate: 1 / 80 },
-    ],
-  },
-  GateOfElidinis: {
-    fullName: ["The Gate of Elidinis"],
-    drops: [
-      { name: "Eclipsed Soul prayer codex", rate: 1 / 480 },
-      { name: "Memory dowser", rate: 1 / 480 },
-      { name: "Runic attuner", rate: 1 / 480 },
-      { name: "Scripture of Elidinis", rate: 1 / 480 },
-    ],
-  },
-};
 
 export default function App() {
   const [boss, setBoss] = useState("Rasial");
@@ -259,29 +228,7 @@ export default function App() {
       </div>
 
       <div className="flex w-full min-h-screen max-w-7xl mx-auto items-start justify-center gap-8 px-4">
-        {/* Instructions Card */}
-        <div className="hidden lg:block w-64 min-h-[300px]">
-          <Card>
-            <CardContent className="pt-4">
-              <h2 className="text-lg font-semibold mb-2 border-b pb-1">
-                Instructions
-              </h2>
-              <ul className="list-disc list-inside text-gray-700 space-y-2">
-                <li>Select a boss from the dropdown menu.</li>
-                <li>Set your average kill time (minutes and seconds).</li>
-                <li>
-                  Add drops to your log by selecting the drop, entering the kill
-                  number, sale price, and clicking "Add Drop".
-                </li>
-                <li>
-                  For bosses with common drops stored in chest, enter the chest
-                  value and set it.
-                </li>
-                <li>Review your GP statistics and drop log.</li>
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
+        <InstructionsCard />
 
         <div className="flex-1 flex justify-center w-full max-w-2x1">
           {/* Main Card */}
@@ -438,17 +385,7 @@ export default function App() {
         </div>
 
         {/* Right FAQ Card */}
-        <div className="hidden lg:block w-64 min-h-[300px]">
-          <Card>
-            <CardContent className="pt-4">
-              <h2 className="text-lg font-semibold mb-2 border-b pb-1">FAQ</h2>
-              {/* ...FAQ content goes here... */}
-              <span className="text-gray-400 italic mt-8">
-                FAQ coming soon...
-              </span>
-            </CardContent>
-          </Card>
-        </div>
+        <FAQCard />
 
         {/* <Button variant="outline" onClick={() => setShowChart(!showChart)}>
           {showChart ? "Hide Chart" : "Show Chart"}
