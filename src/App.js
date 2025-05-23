@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./output.css";
-import { useState, useEffect } from "react";
 import { Card, CardContent } from "./components/ui/card";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
@@ -8,121 +7,83 @@ import InstructionsCard from "./components/InstructionsCard";
 import FAQCard from "./components/FAQCard";
 import bosses from "./components/bosses";
 
-// import {
-//   LineChart,
-//   Line,
-//   XAxis,
-//   YAxis,
-//   Tooltip,
-//   ResponsiveContainer,
-// } from "recharts";
+// Utility to get the default bossData structure for all bosses
+const getDefaultBossData = () =>
+  Object.fromEntries(
+    Object.keys(bosses).map((b) => [
+      b,
+      {
+        kills: [],
+        killTime: 0,
+        storedCommonValue: "",
+      },
+    ])
+  );
 
 export default function App() {
   const [boss, setBoss] = useState("Rasial");
-  const [kills, setKills] = useState([]);
+  const [bossData, setBossData] = useState(null); // Will be set after loading
+  const [loaded, setLoaded] = useState(false);
+
+  // UI State
   const [killInput, setKillInput] = useState("1");
   const [dropInput, setDropInput] = useState("");
-
-  //Kill times
-  const [killTime, setKillTime] = useState(0);
+  const [commonValue, setCommonValue] = useState("");
   const [tempMinutes, setTempMinutes] = useState("");
   const [tempSeconds, setTempSeconds] = useState("");
-  const [timeLockedMap, setTimeLockedMap] = useState({});
-
-  //common drops chest
-  const [commonValue, setCommonValue] = useState("");
-  const [storedCommonValue, setStoredCommonValue] = useState("");
-  const [commonLockedMap, setCommonLockedMap] = useState({});
-
-  // const [showChart, setShowChart] = useState(false);
-
   const [errorMessage, setErrorMessage] = useState("");
-  const timeLocked = timeLockedMap[boss] || false;
-  const commonLocked = commonLockedMap[boss] || false;
   const [dropPriceInput, setDropPriceInput] = useState("");
-
-  // Save code feature
   const [saveCode, setSaveCode] = useState("");
   const [importCode, setImportCode] = useState("");
   const [importError, setImportError] = useState("");
+  const [timeLockedMap, setTimeLockedMap] = useState({});
+  const [commonLockedMap, setCommonLockedMap] = useState({});
 
+  // --- Load all bosses from localStorage on mount ---
   useEffect(() => {
-    const savedKills = localStorage.getItem(`boss_tracker_${boss}`);
-    const savedKillTime = localStorage.getItem(`boss_tracker_${boss}_killTime`);
-    const savedCommon = localStorage.getItem(`boss_tracker_${boss}_common`);
-
-    if (savedKills) {
-      setKills(JSON.parse(savedKills));
+    const saved = localStorage.getItem("boss_tracker_data");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setBossData({ ...getDefaultBossData(), ...parsed });
+      } catch {
+        setBossData(getDefaultBossData());
+      }
     } else {
-      setKills([]);
+      setBossData(getDefaultBossData());
     }
+    setLoaded(true);
+  }, []);
 
-    if (savedKillTime) {
-      const seconds = Number(savedKillTime);
-      setKillTime(seconds);
-      setTempMinutes(Math.floor(seconds / 60).toString());
-      setTempSeconds((seconds % 60).toString());
-      setTimeLockedMap((prev) => ({ ...prev, [boss]: true }));
-    } else {
-      setKillTime(0);
-      setTempMinutes("");
-      setTempSeconds("");
-      setTimeLockedMap((prev) => ({ ...prev, [boss]: false }));
-    }
+  // --- Save all bosses to localStorage whenever bossData changes, but only after loading ---
+  useEffect(() => {
+    if (!loaded || !bossData) return;
+    localStorage.setItem("boss_tracker_data", JSON.stringify(bossData));
+  }, [bossData, loaded]);
 
-    if (savedCommon) {
-      setStoredCommonValue(savedCommon);
-      setCommonLockedMap((prev) => ({ ...prev, [boss]: true }));
-    } else {
-      setStoredCommonValue("");
-      setCommonLockedMap((prev) => ({ ...prev, [boss]: false }));
-    }
-
+  // --- Sync UI state when boss or bossData changes ---
+  useEffect(() => {
+    if (!bossData) return;
+    // Load killTime, storedCommonValue, timeLocked, commonLocked for this boss
+    const { killTime = 0, storedCommonValue = "" } = bossData[boss] || {};
+    setTempMinutes(killTime ? Math.floor(killTime / 60).toString() : "");
+    setTempSeconds(killTime ? (killTime % 60).toString() : "");
+    setTimeLockedMap((prev) => ({ ...prev, [boss]: !!killTime }));
+    setCommonLockedMap((prev) => ({
+      ...prev,
+      [boss]: storedCommonValue !== "",
+    }));
+    setCommonValue("");
     setDropInput("");
     setErrorMessage("");
-  }, [boss]);
+    setKillInput(
+      bossData[boss]?.kills.length > 0
+        ? (Math.max(...bossData[boss].kills.map((k) => k.kill)) + 1).toString()
+        : "1"
+    );
+  }, [boss, bossData]);
 
-  useEffect(() => {
-    localStorage.setItem(`boss_tracker_${boss}`, JSON.stringify(kills));
-  }, [kills, boss]);
-
-   // --- Save Code Export ---
-  const handleExportSaveCode = () => {
-    const exportData = {
-      boss,
-      kills,
-      killTime,
-      storedCommonValue,
-    };
-    setSaveCode(btoa(JSON.stringify(exportData)));
-  };
-
-  // --- Save Code Import ---
-  const handleImportSaveCode = () => {
-    try {
-      const imported = JSON.parse(atob(importCode));
-      if (imported.boss !== boss) {
-        setImportError("Save code is for a different boss!");
-        return;
-      }
-      setKills(imported.kills || []);
-      setKillTime(imported.killTime || 0);
-      setStoredCommonValue(imported.storedCommonValue || "");
-      // update tempMinutes/tempSeconds
-      setTempMinutes(Math.floor((imported.killTime || 0) / 60).toString());
-      setTempSeconds(((imported.killTime || 0) % 60).toString());
-      setTimeLockedMap((prev) => ({ ...prev, [boss]: true }));
-
-      // Update localStorage as well
-      localStorage.setItem(`boss_tracker_${boss}`, JSON.stringify(imported.kills || []));
-      localStorage.setItem(`boss_tracker_${boss}_killTime`, imported.killTime || 0);
-      localStorage.setItem(`boss_tracker_${boss}_common`, imported.storedCommonValue || "");
-      setImportError("");
-    } catch (e) {
-      setImportError("Invalid save code!");
-    }
-  };
-
+  // --- Handlers ---
   const handleAddDrop = () => {
     if (!dropInput) {
       setErrorMessage("Please select a drop.");
@@ -132,24 +93,26 @@ export default function App() {
       setErrorMessage("Sale price cannot be negative.");
       return;
     }
-
     const killNumber = Number(killInput);
+    const kills = bossData[boss]?.kills || [];
     const lastDropKill = kills.reduce(
       (max, k) => (k.drop ? Math.max(max, k.kill) : max),
       0
     );
-
     if (killNumber <= lastDropKill) {
       setErrorMessage(
         `You can't add a drop with a kill count less than or equal to your last drop (#${lastDropKill}).`
       );
       return;
     }
-
-    setKills([
+    const newKills = [
       ...kills,
       { kill: killNumber, drop: dropInput, value: Number(dropPriceInput) },
-    ]);
+    ];
+    setBossData((prev) => ({
+      ...prev,
+      [boss]: { ...prev[boss], kills: newKills },
+    }));
     setKillInput((killNumber + 1).toString());
     setDropInput("");
     setDropPriceInput("");
@@ -157,15 +120,21 @@ export default function App() {
   };
 
   const handleDeleteKill = (index) => {
+    const kills = bossData[boss]?.kills || [];
     const newKills = [...kills];
     newKills.splice(index, 1);
-    setKills(newKills);
+    setBossData((prev) => ({
+      ...prev,
+      [boss]: { ...prev[boss], kills: newKills },
+    }));
   };
 
   const handleSetKillTime = () => {
     const totalSeconds = Number(tempMinutes) * 60 + Number(tempSeconds);
-    setKillTime(totalSeconds);
-    localStorage.setItem(`boss_tracker_${boss}_killTime`, totalSeconds);
+    setBossData((prev) => ({
+      ...prev,
+      [boss]: { ...prev[boss], killTime: totalSeconds },
+    }));
     setTimeLockedMap((prev) => ({ ...prev, [boss]: true }));
   };
 
@@ -174,8 +143,10 @@ export default function App() {
   };
 
   const handleSetCommonValue = () => {
-    setStoredCommonValue(commonValue);
-    localStorage.setItem(`boss_tracker_${boss}_common`, commonValue);
+    setBossData((prev) => ({
+      ...prev,
+      [boss]: { ...prev[boss], storedCommonValue: commonValue },
+    }));
     setCommonLockedMap((prev) => ({ ...prev, [boss]: true }));
   };
 
@@ -183,11 +154,33 @@ export default function App() {
     setCommonLockedMap((prev) => ({ ...prev, [boss]: false }));
   };
 
+  // --- Save Code Export ---
+  const handleExportSaveCode = () => {
+    setSaveCode(btoa(JSON.stringify(bossData)));
+  };
+
+  // --- Save Code Import ---
+  const handleImportSaveCode = () => {
+    try {
+      const imported = JSON.parse(atob(importCode));
+      setBossData({ ...getDefaultBossData(), ...imported });
+      setImportError("");
+    } catch (e) {
+      setImportError("Invalid save code!");
+    }
+  };
+
+  // --- Derived values ---
+  if (!bossData) return null; // or loading spinner
+  const kills = bossData[boss]?.kills || [];
+  const killTime = bossData[boss]?.killTime || 0;
+  const storedCommonValue = bossData[boss]?.storedCommonValue || "";
+  const commonLocked = commonLockedMap[boss] || false;
+  const timeLocked = timeLockedMap[boss] || false;
+
   const totalGP =
     kills.reduce((sum, k) => sum + (k.value || 0), 0) +
     Number(storedCommonValue || 0);
-
-  // const chartData = kills.map((k) => ({ kill: k.kill, gp: k.value || 0 }));
 
   const lastKillNumber =
     kills.length > 0 ? Math.max(...kills.map((k) => k.kill)) : 0;
@@ -196,10 +189,11 @@ export default function App() {
     totalTime > 0 ? (totalGP / (totalTime / 3600)).toFixed(0) : 0;
   const gpPerKill =
     lastKillNumber > 0 ? (totalGP / lastKillNumber).toFixed(0) : 0;
+
   const calculateDryStreaks = (kills) => {
     const streaks = [];
     let lastDropKill = null;
-    kills.forEach((k, i) => {
+    kills.forEach((k) => {
       if (k.drop) {
         const streak = lastDropKill === null ? k.kill : k.kill - lastDropKill;
         streaks.push(streak);
@@ -214,13 +208,11 @@ export default function App() {
   const dryStreaks = calculateDryStreaks(kills);
   const getDryStreakColor = (streak) => {
     if (streak === null) return "";
-
     const totalDropRate = bosses[boss].drops.reduce(
       (sum, drop) => sum + drop.rate,
       0
     );
     const avgDropChance = 1 / totalDropRate;
-
     if (streak <= avgDropChance) return "text-green-600"; // lucky
     if (streak <= 2 * avgDropChance) return "text-orange-500"; // dry
     return "text-red-700 font-bold"; // very dry
@@ -282,7 +274,7 @@ export default function App() {
           {/* Main Card */}
           <Card>
             <CardContent className="pt-4">
-               {/* --- Save/Load Code Feature --- */}
+              {/* --- Save/Load Code Feature --- */}
               <div className="my-4 flex flex-col gap-2">
                 <Button onClick={handleExportSaveCode}>
                   Generate Save Code
@@ -296,7 +288,7 @@ export default function App() {
                   />
                 )}
 
-<div className="flex gap-2 mt-2">
+                <div className="flex gap-2 mt-2">
                   <Input
                     placeholder="Paste save code here"
                     value={importCode}
@@ -415,7 +407,7 @@ export default function App() {
                       <th className="py-1">Dry Streak</th>
                       <th className="py-1">Kill #</th>
                       <th className="py-1">Drop</th>
-                      <th className="py-1">Value</th>
+                      <th className="py-1">Price</th>
                       <th className="py-1"></th>
                     </tr>
                   </thead>
@@ -439,9 +431,7 @@ export default function App() {
                           <td className="py-1">{k.kill}</td>
                           <td className="py-1">{k.drop || "No drop"}</td>
                           <td className="py-1">
-                            <td className="py-1">
-                              {k.value ? k.value.toLocaleString() : "0"}
-                            </td>
+                            {k.value ? k.value.toLocaleString() : "0"}
                           </td>
                           <td className="py-1">
                             <Button

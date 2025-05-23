@@ -18,10 +18,10 @@ function InstructionsCard() {
             and set it. (optional)
           </li>
           <li>Review your GP statistics and drop log.</li>
-          <li>
-            I highly advice you to save your drop log using the Generate Save
-            Code button, as i update the app frequently and drop log reset can
-            happen.
+          <li className="text-red-600 font-bold">
+            I highly suggest to save your drop log code using the Generate Save
+            Code button from time to time, as i update the app frequently and drop log reset can
+            happen. (Hopefully not)
           </li>
         </ul>
       </div>
