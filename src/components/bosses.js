@@ -30,6 +30,17 @@ const bosses = {
       { name: "Scripture of Elidinis", rate: 1 / 480 },
     ],
   },
+  Solak: {
+    fullName: ["Solak, Guardian of the Grove"],
+    drops: [
+      { name: "Erethdor's grimoire", rate: 1/200 },
+      { name: "Blightbound crossbow", rate: 1/400 },
+      { name: "Off-hand Blightbound crossbow", rate: 1/400},
+      { name: "Purple mushroom", rate: 1/500 },
+      { name: "Merethiel's stave", rate: 1/500 },
+      { name: "Cinderbane gloves", rate: 1/1000 },
+    ]
+  }
 };
 
 export default bosses;

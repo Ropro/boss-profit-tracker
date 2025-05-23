@@ -1,5 +1,80 @@
-import React from "react";
-function InstructionsCard() {
+import React, { useState } from "react";
+import { Button } from "./ui/button";
+
+// Simple modal implementation
+function Modal({ open, onClose, title, children }) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30">
+      <div className="bg-white rounded-lg shadow-lg p-6 min-w-[320px] relative">
+        <button
+          className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+          onClick={onClose}
+          aria-label="Close"
+        >
+          ×
+        </button>
+        <h3 className="text-lg font-semibold mb-4">{title}</h3>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+export default function InstructionsCard({
+  bossData,
+  importError,
+  onImport,
+  setImportError, // Accepts a function to set error in parent
+}) {
+  const [exportOpen, setExportOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importCode, setImportCode] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [exportCode, setExportCode] = useState("");
+  const [localImportError, setLocalImportError] = useState("");
+
+  // Only generate the code ONCE when opening the modal
+  const handleExportClick = () => {
+    if (!bossData) {
+      setExportCode("No data to export.");
+      setExportOpen(true);
+      setCopied(false);
+      return;
+    }
+    try {
+      const code = btoa(JSON.stringify(bossData));
+      setExportCode(code);
+      setExportOpen(true);
+      setCopied(false);
+    } catch (e) {
+      setExportCode("Error exporting data.");
+      setExportOpen(true);
+      setCopied(false);
+    }
+  };
+
+  const handleCopy = () => {
+    if (exportCode) {
+      navigator.clipboard.writeText(exportCode);
+      setCopied(true);
+    }
+  };
+
+  const handleImportSubmit = () => {
+    try {
+      const imported = JSON.parse(atob(importCode));
+      onImport(imported);
+      if (setImportError) setImportError(""); // Clear global error if present
+      setLocalImportError("");
+      setImportOpen(false);
+      setImportCode("");
+    } catch (e) {
+      setLocalImportError("Invalid save code!");
+      if (setImportError) setImportError("Invalid save code!");
+    }
+  };
+
   return (
     <div className="hidden lg:block w-64 min-h-[300px]">
       <div className="bg-white rounded-xl shadow p-6">
@@ -19,14 +94,63 @@ function InstructionsCard() {
           </li>
           <li>Review your GP statistics and drop log.</li>
           <li className="text-red-600 font-bold">
-            I highly suggest to save your drop log code using the Generate Save
-            Code button from time to time, as i update the app frequently and drop log reset can
-            happen. (Hopefully not)
+            I highly suggest to save your drop log code using the Export Data
+            button from time to time, as I update the app frequently and drop
+            log reset can happen. (Hopefully not)
           </li>
         </ul>
+
+        {/* --- Export/Import Buttons --- */}
+        <div className="mt-6 flex flex-col gap-2">
+          <Button onClick={handleExportClick}>Export Data</Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setImportOpen(true);
+              setLocalImportError("");
+              if (setImportError) setImportError("");
+            }}
+          >
+            Import Data
+          </Button>
+        </div>
+        {/* Export Modal */}
+        <Modal
+          open={exportOpen}
+          onClose={() => setExportOpen(false)}
+          title="Export Data"
+        >
+          <textarea
+            className="w-full p-2 bg-gray-100 text-xs mb-2"
+            value={exportCode}
+            readOnly
+            rows={3}
+          />
+          <Button onClick={handleCopy}>{copied ? "Copied!" : "Copy"}</Button>
+        </Modal>
+        {/* Import Modal */}
+        <Modal
+          open={importOpen}
+          onClose={() => setImportOpen(false)}
+          title="Import Data"
+        >
+          <textarea
+            className="w-full p-2 bg-gray-100 text-xs mb-2"
+            value={importCode}
+            onChange={(e) => setImportCode(e.target.value)}
+            placeholder="Paste your save code here"
+            rows={3}
+          />
+          <Button onClick={handleImportSubmit} className="mr-2">
+            Import
+          </Button>
+          {(localImportError || importError) && (
+            <div className="text-red-500 text-sm mt-2">
+              {localImportError || importError}
+            </div>
+          )}
+        </Modal>
       </div>
     </div>
   );
 }
-
-export default InstructionsCard;

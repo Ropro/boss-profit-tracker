@@ -160,14 +160,10 @@ export default function App() {
   };
 
   // --- Save Code Import ---
-  const handleImportSaveCode = () => {
-    try {
-      const imported = JSON.parse(atob(importCode));
-      setBossData({ ...getDefaultBossData(), ...imported });
-      setImportError("");
-    } catch (e) {
-      setImportError("Invalid save code!");
-    }
+  const handleImportSaveCode = (imported) => {
+    // Optionally validate shape here
+    setBossData({ ...getDefaultBossData(), ...imported });
+    setImportError(""); // clear error if success
   };
 
   // --- Derived values ---
@@ -269,40 +265,16 @@ export default function App() {
       </div>
 
       <div className="flex w-full min-h-screen max-w-7xl mx-auto items-start justify-center gap-8 px-4">
-        <InstructionsCard />
+        <InstructionsCard
+          bossData={bossData}
+          importError={importError}
+          setImportError={setImportError}
+          onImport={handleImportSaveCode}
+        />
         <div className="flex-1 flex justify-center w-full max-w-2x1">
           {/* Main Card */}
           <Card>
             <CardContent className="pt-4">
-              {/* --- Save/Load Code Feature --- */}
-              <div className="my-4 flex flex-col gap-2">
-                <Button onClick={handleExportSaveCode}>
-                  Generate Save Code
-                </Button>
-                {saveCode && (
-                  <textarea
-                    className="w-full p-2 bg-gray-100 text-xs"
-                    value={saveCode}
-                    readOnly
-                    rows={2}
-                  />
-                )}
-
-                <div className="flex gap-2 mt-2">
-                  <Input
-                    placeholder="Paste save code here"
-                    value={importCode}
-                    onChange={(e) => setImportCode(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button onClick={handleImportSaveCode}>Load Save Code</Button>
-                </div>
-                {importError && (
-                  <div className="text-red-500">{importError}</div>
-                )}
-              </div>
-              {/* --- END Save/Load Code Feature --- */}
-
               <div className="flex gap-2">
                 <Input
                   type="number"
