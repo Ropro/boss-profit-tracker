@@ -8,32 +8,43 @@ import InstructionsCard from "./components/InstructionsCard";
 import FAQCard from "./components/FAQCard";
 import bosses from "./components/bosses";
 
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+// import {
+//   LineChart,
+//   Line,
+//   XAxis,
+//   YAxis,
+//   Tooltip,
+//   ResponsiveContainer,
+// } from "recharts";
 
 export default function App() {
   const [boss, setBoss] = useState("Rasial");
   const [kills, setKills] = useState([]);
   const [killInput, setKillInput] = useState("1");
   const [dropInput, setDropInput] = useState("");
+
+  //Kill times
   const [killTime, setKillTime] = useState(0);
   const [tempMinutes, setTempMinutes] = useState("");
   const [tempSeconds, setTempSeconds] = useState("");
   const [timeLockedMap, setTimeLockedMap] = useState({});
+
+  //common drops chest
   const [commonValue, setCommonValue] = useState("");
   const [storedCommonValue, setStoredCommonValue] = useState("");
   const [commonLockedMap, setCommonLockedMap] = useState({});
-  const [showChart, setShowChart] = useState(false);
+
+  // const [showChart, setShowChart] = useState(false);
+
   const [errorMessage, setErrorMessage] = useState("");
   const timeLocked = timeLockedMap[boss] || false;
   const commonLocked = commonLockedMap[boss] || false;
   const [dropPriceInput, setDropPriceInput] = useState("");
+
+  // Save code feature
+  const [saveCode, setSaveCode] = useState("");
+  const [importCode, setImportCode] = useState("");
+  const [importError, setImportError] = useState("");
 
   useEffect(() => {
     const savedKills = localStorage.getItem(`boss_tracker_${boss}`);
@@ -75,7 +86,44 @@ export default function App() {
     localStorage.setItem(`boss_tracker_${boss}`, JSON.stringify(kills));
   }, [kills, boss]);
 
-  const handleAddKill = () => {
+   // --- Save Code Export ---
+  const handleExportSaveCode = () => {
+    const exportData = {
+      boss,
+      kills,
+      killTime,
+      storedCommonValue,
+    };
+    setSaveCode(btoa(JSON.stringify(exportData)));
+  };
+
+  // --- Save Code Import ---
+  const handleImportSaveCode = () => {
+    try {
+      const imported = JSON.parse(atob(importCode));
+      if (imported.boss !== boss) {
+        setImportError("Save code is for a different boss!");
+        return;
+      }
+      setKills(imported.kills || []);
+      setKillTime(imported.killTime || 0);
+      setStoredCommonValue(imported.storedCommonValue || "");
+      // update tempMinutes/tempSeconds
+      setTempMinutes(Math.floor((imported.killTime || 0) / 60).toString());
+      setTempSeconds(((imported.killTime || 0) % 60).toString());
+      setTimeLockedMap((prev) => ({ ...prev, [boss]: true }));
+
+      // Update localStorage as well
+      localStorage.setItem(`boss_tracker_${boss}`, JSON.stringify(imported.kills || []));
+      localStorage.setItem(`boss_tracker_${boss}_killTime`, imported.killTime || 0);
+      localStorage.setItem(`boss_tracker_${boss}_common`, imported.storedCommonValue || "");
+      setImportError("");
+    } catch (e) {
+      setImportError("Invalid save code!");
+    }
+  };
+
+  const handleAddDrop = () => {
     if (!dropInput) {
       setErrorMessage("Please select a drop.");
       return;
@@ -138,7 +186,8 @@ export default function App() {
   const totalGP =
     kills.reduce((sum, k) => sum + (k.value || 0), 0) +
     Number(storedCommonValue || 0);
-  const chartData = kills.map((k) => ({ kill: k.kill, gp: k.value || 0 }));
+
+  // const chartData = kills.map((k) => ({ kill: k.kill, gp: k.value || 0 }));
 
   const lastKillNumber =
     kills.length > 0 ? Math.max(...kills.map((k) => k.kill)) : 0;
@@ -229,11 +278,39 @@ export default function App() {
 
       <div className="flex w-full min-h-screen max-w-7xl mx-auto items-start justify-center gap-8 px-4">
         <InstructionsCard />
-
         <div className="flex-1 flex justify-center w-full max-w-2x1">
           {/* Main Card */}
           <Card>
             <CardContent className="pt-4">
+               {/* --- Save/Load Code Feature --- */}
+              <div className="my-4 flex flex-col gap-2">
+                <Button onClick={handleExportSaveCode}>
+                  Generate Save Code
+                </Button>
+                {saveCode && (
+                  <textarea
+                    className="w-full p-2 bg-gray-100 text-xs"
+                    value={saveCode}
+                    readOnly
+                    rows={2}
+                  />
+                )}
+
+<div className="flex gap-2 mt-2">
+                  <Input
+                    placeholder="Paste save code here"
+                    value={importCode}
+                    onChange={(e) => setImportCode(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button onClick={handleImportSaveCode}>Load Save Code</Button>
+                </div>
+                {importError && (
+                  <div className="text-red-500">{importError}</div>
+                )}
+              </div>
+              {/* --- END Save/Load Code Feature --- */}
+
               <div className="flex gap-2">
                 <Input
                   type="number"
@@ -270,7 +347,7 @@ export default function App() {
                   className="w-32 h-10"
                 />
                 <Button
-                  onClick={handleAddKill}
+                  onClick={handleAddDrop}
                   disabled={!dropInput || !dropPriceInput}
                   className="w-16 h-14"
                 >
@@ -330,7 +407,7 @@ export default function App() {
 
               <div className="pt-4">
                 <h2 className="text-lg font-semibold mb-2 border-b pb-1">
-                  Kill Log
+                  Drop Log
                 </h2>
                 <table className="w-full text-sm text-left border border-gray-200 shadow-sm rounded-xl overflow-hidden">
                   <thead>
@@ -344,6 +421,7 @@ export default function App() {
                   </thead>
                   <tbody>
                     {kills.map((k, index) => {
+                      // eslint-disable-next-line
                       const drop = bosses[boss].drops.find(
                         (d) => d.name === k.drop
                       );
@@ -383,33 +461,7 @@ export default function App() {
             </CardContent>
           </Card>
         </div>
-
-        {/* Right FAQ Card */}
         <FAQCard />
-
-        {/* <Button variant="outline" onClick={() => setShowChart(!showChart)}>
-          {showChart ? "Hide Chart" : "Show Chart"}
-        </Button> */}
-
-        {showChart && (
-          <Card>
-            <CardContent className="pt-4 h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <XAxis dataKey="kill" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="gp"
-                    stroke="#10b981"
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );
