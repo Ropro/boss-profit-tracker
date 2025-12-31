@@ -40,6 +40,59 @@ const bosses = {
       { name: "Merethiel's stave", rate: 1/500 },
       { name: "Cinderbane gloves", rate: 1/1000 },
     ]
+  },
+  Croesus: {
+    fullName: ["Croesus"],
+    drops: [
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+    ]
+  },
+  ED1: {
+    fullName: ["Temple of Aminishi (ED1)"],
+    drops: [
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+    ]
+  },
+  ED2: {
+    fullName: ["Dragonkin laboratory (ED2)"],
+    drops: [
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+    ]
+  },
+  ED3: {
+    fullName: ["Shadow reef (ED3)"],
+    drops: [
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+    ]
+  },
+  ED4: {
+    fullName: ["Zamorak, Lord of Chaos (ED4)"],
+    drops: [
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+      { name: "x", rate: 1/100},
+    ]
   }
 };
 

@@ -7,7 +7,6 @@ import InstructionsCard from "./components/InstructionsCard";
 import FAQCard from "./components/FAQCard";
 import bosses from "./components/bosses";
 
-// Utility to get the default bossData structure for all bosses
 const getDefaultBossData = () =>
   Object.fromEntries(
     Object.keys(bosses).map((b) => [
@@ -22,7 +21,7 @@ const getDefaultBossData = () =>
 
 export default function App() {
   const [boss, setBoss] = useState("Rasial");
-  const [bossData, setBossData] = useState(null); // Will be set after loading
+  const [bossData, setBossData] = useState(null);
   const [loaded, setLoaded] = useState(false);
 
   // UI State
@@ -33,13 +32,11 @@ export default function App() {
   const [tempSeconds, setTempSeconds] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [dropPriceInput, setDropPriceInput] = useState("");
-  const [saveCode, setSaveCode] = useState("");
-  const [importCode, setImportCode] = useState("");
   const [importError, setImportError] = useState("");
   const [timeLockedMap, setTimeLockedMap] = useState({});
   const [commonLockedMap, setCommonLockedMap] = useState({});
 
-  // --- Load all bosses from localStorage on mount ---
+  // --- Load all bosses from localStorage ---
   useEffect(() => {
     const saved = localStorage.getItem("boss_tracker_data");
     if (saved) {
@@ -55,7 +52,7 @@ export default function App() {
     setLoaded(true);
   }, []);
 
-  // --- Save all bosses to localStorage whenever bossData changes, but only after loading ---
+  // --- Save all bosses to localStorage whenever bossData changes ---
   useEffect(() => {
     if (!loaded || !bossData) return;
     localStorage.setItem("boss_tracker_data", JSON.stringify(bossData));
@@ -64,7 +61,6 @@ export default function App() {
   // --- Sync UI state when boss or bossData changes ---
   useEffect(() => {
     if (!bossData) return;
-    // Load killTime, storedCommonValue, timeLocked, commonLocked for this boss
     const { killTime = 0, storedCommonValue = "" } = bossData[boss] || {};
     setTempMinutes(killTime ? Math.floor(killTime / 60).toString() : "");
     setTempSeconds(killTime ? (killTime % 60).toString() : "");
@@ -154,20 +150,13 @@ export default function App() {
     setCommonLockedMap((prev) => ({ ...prev, [boss]: false }));
   };
 
-  // --- Save Code Export ---
-  const handleExportSaveCode = () => {
-    setSaveCode(btoa(JSON.stringify(bossData)));
-  };
-
   // --- Save Code Import ---
   const handleImportSaveCode = (imported) => {
-    // Optionally validate shape here
     setBossData({ ...getDefaultBossData(), ...imported });
-    setImportError(""); // clear error if success
+    setImportError("");
   };
 
-  // --- Derived values ---
-  if (!bossData) return null; // or loading spinner
+  if (!bossData) return null;
   const kills = bossData[boss]?.kills || [];
   const killTime = bossData[boss]?.killTime || 0;
   const storedCommonValue = bossData[boss]?.storedCommonValue || "";
@@ -219,7 +208,7 @@ export default function App() {
       <div className="flex flex-col items-center gap-2">
         <div className="w-full max-w-xl mx-auto"></div>
         <h1 className="text-3xl font-bold text-center text-gray-800">
-          Boss Tracker
+          Boss Profit Tracker
         </h1>
         <div className="flex gap-4 items-center">
           <select
@@ -303,7 +292,7 @@ export default function App() {
                     const value = e.target.value;
                     if (value === "" || Number(value) >= 0) {
                       setDropPriceInput(value);
-                      setErrorMessage(""); // Clear error if valid
+                      setErrorMessage("");
                     } else {
                       setErrorMessage("Sale price cannot be negative.");
                     }

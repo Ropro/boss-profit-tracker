@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "./ui/button";
 
-// Simple modal implementation
 function Modal({ open, onClose, title, children }) {
   if (!open) return null;
   return (
@@ -25,7 +24,7 @@ export default function InstructionsCard({
   bossData,
   importError,
   onImport,
-  setImportError, // Accepts a function to set error in parent
+  setImportError,
 }) {
   const [exportOpen, setExportOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
@@ -34,7 +33,6 @@ export default function InstructionsCard({
   const [exportCode, setExportCode] = useState("");
   const [localImportError, setLocalImportError] = useState("");
 
-  // Only generate the code ONCE when opening the modal
   const handleExportClick = () => {
     if (!bossData) {
       setExportCode("No data to export.");
@@ -65,7 +63,7 @@ export default function InstructionsCard({
     try {
       const imported = JSON.parse(atob(importCode));
       onImport(imported);
-      if (setImportError) setImportError(""); // Clear global error if present
+      if (setImportError) setImportError("");
       setLocalImportError("");
       setImportOpen(false);
       setImportCode("");
