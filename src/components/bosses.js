@@ -1,6 +1,6 @@
 const bosses = {
   Rasial: {
-    fullName: ["Rasial, the First Necromancer"],
+    fullName: "Rasial, the First Necromancer",
     drops: [
       { name: "Omni guard", rate: 1 / 632 },
       { name: "Soulbound lantern", rate: 1 / 632 },
@@ -12,7 +12,7 @@ const bosses = {
     ],
   },
   Nakatra: {
-    fullName: ["Nakatra, Devourer Eternal"],
+    fullName: "Nakatra, Devourer Eternal",
     drops: [
       { name: "Divine Rage prayer codex", rate: 1 / 160 },
       { name: "Scripture of Amascut", rate: 1 / 160 },
@@ -22,7 +22,7 @@ const bosses = {
     ],
   },
   GateOfElidinis: {
-    fullName: ["The Gate of Elidinis"],
+    fullName: "The Gate of Elidinis",
     drops: [
       { name: "Eclipsed Soul prayer codex", rate: 1 / 480 },
       { name: "Memory dowser", rate: 1 / 480 },
@@ -31,7 +31,7 @@ const bosses = {
     ],
   },
   Solak: {
-    fullName: ["Solak, Guardian of the Grove"],
+    fullName: "Solak, Guardian of the Grove",
     drops: [
       { name: "Erethdor's grimoire", rate: 1/200 },
       { name: "Blightbound crossbow", rate: 1/400 },
@@ -42,7 +42,7 @@ const bosses = {
     ]
   },
   Croesus: {
-    fullName: ["Croesus"],
+    fullName: "Croesus",
     drops: [
       { name: "x", rate: 1/100},
       { name: "x", rate: 1/100},
@@ -53,7 +53,7 @@ const bosses = {
     ]
   },
   ED1: {
-    fullName: ["Temple of Aminishi (ED1)"],
+    fullName: "Temple of Aminishi (ED1)",
     drops: [
       { name: "x", rate: 1/100},
       { name: "x", rate: 1/100},
@@ -64,7 +64,7 @@ const bosses = {
     ]
   },
   ED2: {
-    fullName: ["Dragonkin laboratory (ED2)"],
+    fullName: "Dragonkin laboratory (ED2)",
     drops: [
       { name: "x", rate: 1/100},
       { name: "x", rate: 1/100},
@@ -74,7 +74,7 @@ const bosses = {
     ]
   },
   ED3: {
-    fullName: ["Shadow reef (ED3)"],
+    fullName: "Shadow reef (ED3)",
     drops: [
       { name: "x", rate: 1/100},
       { name: "x", rate: 1/100},
@@ -84,7 +84,7 @@ const bosses = {
     ]
   },
   ED4: {
-    fullName: ["Zamorak, Lord of Chaos (ED4)"],
+    fullName: "Zamorak, Lord of Chaos (ED4)",
     drops: [
       { name: "x", rate: 1/100},
       { name: "x", rate: 1/100},
