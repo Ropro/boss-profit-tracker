@@ -4,7 +4,8 @@ export function Input({ className = "", ...props }) {
   return (
     <input
       {...props}
-      className={`border border-gray-300 rounded-xl px-3 py-2 bg-white dark:bg-gray-900 text-sm ${className}`}
+      className={`border border-gray-300 rounded-xl px-3 py-2 bg-white text-gray-900 text-sm ${className}`}
+      style={{ backgroundColor: 'white', color: '#111827' }}
     />
   );
 }
